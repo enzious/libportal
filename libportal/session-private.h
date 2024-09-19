@@ -36,6 +36,7 @@ struct _XdpSession {
   XdpSessionState state;
   XdpDeviceType devices;
   GVariant *streams;
+  gboolean clipboard_enabled;
 
   XdpPersistMode persist_mode;
   char *restore_token;

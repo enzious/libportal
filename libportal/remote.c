@@ -707,6 +707,7 @@ session_started (GDBusConnection *bus,
     {
       guint32 devices;
       GVariant *streams;
+      gboolean clipboard_enabled;
 
       if (!g_variant_lookup (ret, "persist_mode", "u", &call->session->persist_mode))
         call->session->persist_mode = XDP_PERSIST_MODE_NONE;
@@ -717,6 +718,23 @@ session_started (GDBusConnection *bus,
       if (g_variant_lookup (ret, "streams", "@a(ua{sv})", &streams))
         _xdp_session_set_streams (call->session, streams);
 
+      /* if (!g_variant_lookup (ret, "notreal", "b", &clipboard_enabled)) { */
+      /*   g_task_return_new_error (call->task, G_IO_ERROR, G_IO_ERROR_CANCELLED, */
+      /*                           "Fake not found"); */
+      /* } else */
+
+      if (!g_variant_lookup (ret, "clipboard_enabled", "b", &clipboard_enabled)) {
+        g_warning("Clipboard not found");
+      }
+
+      if (clipboard_enabled) {
+        g_warning("Clipboard enabled");
+      }
+
+      if (!clipboard_enabled){
+        g_warning("Clipboard not enabled");
+      }
+ 
       g_task_return_boolean (call->task, TRUE);
     }
   else if (response == 1)
@@ -1449,4 +1467,21 @@ _xdp_session_set_session_state (XdpSession *session,
 
   if (state == XDP_SESSION_CLOSED)
     _xdp_session_close (session);
+}
+
+void
+xdp_session_request_clipboard (XdpSession *session)
+{
+  GVariantBuilder options;
+
+  g_warning("Should request clipboard");
+
+  g_variant_builder_init (&options, G_VARIANT_TYPE_VARDICT);
+  g_dbus_connection_call (session->portal->bus,
+                          PORTAL_BUS_NAME,
+                          PORTAL_OBJECT_PATH,
+                          "org.freedesktop.portal.Clipboard",
+                          "RequestClipboard",
+                          g_variant_new ("(oa{sv})", session->id, &options),
+                          NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL, NULL);
 }

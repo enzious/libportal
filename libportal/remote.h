@@ -290,4 +290,7 @@ XdpPersistMode  xdp_session_get_persist_mode  (XdpSession *session);
 XDP_PUBLIC
 char           *xdp_session_get_restore_token (XdpSession *session);
 
+XDP_PUBLIC
+void            xdp_session_request_clipboard (XdpSession *session);
+
 G_END_DECLS
